@@ -1,27 +1,41 @@
 /* eslint no-unused-vars: 1 */
-
+import axios from 'axios';
 import React, { useCallback, useState } from 'react';
 
 const ShortenUrlForm = () => {
     const [value, setValue] = useState('');
+    const [shortUrl, setShortUrl] = useState(null);
+    const apiEndpoint = 'https://api-ssl.bitly.com/v4/shorten';
 
     const onChange = useCallback(
         (e) => {
-            // TODO: Set the component's new state based on the user's input
+
+            setValue(e.target.value)
         },
-        [
-            /* TODO: Add necessary deps */
-        ],
+        [setValue],
     );
 
-    const onSubmit = useCallback(
-        (e) => {
+    const onSubmit = useCallback(async (e) => {
             e.preventDefault();
-            // TODO: shorten url and copy to clipboard
+
+            setShortUrl(null);
+            const data = {
+                "long_url": value
+            }
+            const axiosConfig = {
+                headers: {
+                    'Authorization': `Bearer ${process.env.REACT_APP_BITLY_AUTHORIZATION_TOKEN}`
+                }
+            };
+            
+            try {
+                const result = await axios.post(apiEndpoint, data, axiosConfig)
+                setShortUrl(result.data.id);
+            } catch(error) {
+                console.log(error);
+            }
         },
-        [
-            /* TODO: necessary deps */
-        ],
+        [setShortUrl, value],
     );
 
     return (
@@ -37,8 +51,9 @@ const ShortenUrlForm = () => {
                 />
             </label>
             <input type="submit" value="Shorten and copy URL" />
-            {/* TODO: show below only when the url has been shortened and copied */}
-            <div>{/* Show shortened url --- copied! */}</div>
+            <div>
+                {shortUrl && <p>Shortened url: <a href={`https://${shortUrl}`}>{shortUrl}</a> copied!</p>}
+            </div>
         </form>
     );
 };
