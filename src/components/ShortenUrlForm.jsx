@@ -5,6 +5,7 @@ import React, { useCallback, useState } from 'react';
 const ShortenUrlForm = () => {
     const [value, setValue] = useState('');
     const [shortUrl, setShortUrl] = useState(null);
+    const [isValidUrl, setIsValidUrl] = useState(true);
     const apiEndpoint = 'https://api-ssl.bitly.com/v4/shorten';
 
     const getBitLink = (url) => {
@@ -17,12 +18,25 @@ const ShortenUrlForm = () => {
             }
         };
         
-        return axios.post(apiEndpoint, data, axiosConfig)
+        return axios.post(apiEndpoint, data, axiosConfig);
+    }
+
+    const checkIsValidUrl= (string)=> {
+        let url;
+        
+        try {
+            url = new URL(string);
+        } catch (_) {
+            setIsValidUrl(false);
+            return false;  
+        }
+        setIsValidUrl(true);
+        return url.protocol === "http:" || url.protocol === "https:";
     }
 
     const onChange = useCallback(
         (e) => {
-            setValue(e.target.value)
+            setValue(e.target.value);
         },
         [setValue],
     );
@@ -30,13 +44,14 @@ const ShortenUrlForm = () => {
     const onSubmit = useCallback(async (e) => {
             e.preventDefault();
             setShortUrl(null);
-
-            try {
-                const res = await getBitLink(value);
-                setShortUrl(res.data.id);
-            }
-            catch (error) {
-                alert(`${error} while fetching the bitlink.`);
+            if (checkIsValidUrl(value)) {
+                try {
+                    const res = await getBitLink(value);
+                    setShortUrl(res.data.id);
+                }
+                catch (error) {
+                    alert(`${error} while fetching the bitlink.`);
+                }   
             }
         },
         [setShortUrl, value],
@@ -57,6 +72,9 @@ const ShortenUrlForm = () => {
             <input type="submit" value="Shorten and copy URL" />
             <div>
                 {shortUrl && <p>Shortened url: <a href={`https://${shortUrl}`}>{shortUrl}</a> copied!</p>}
+            </div>
+            <div>
+                {!isValidUrl && 'Invalid url.'}
             </div>
         </form>
     );
