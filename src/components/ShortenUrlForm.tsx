@@ -2,13 +2,13 @@
 import axios from 'axios';
 import React, { useCallback, useState } from 'react';
 
-const ShortenUrlForm = () => {
+const ShortenUrlForm: React.FC = () => {
     const [value, setValue] = useState('');
     const [shortUrl, setShortUrl] = useState(null);
     const [isValidUrl, setIsValidUrl] = useState(true);
     const apiEndpoint = 'https://api-ssl.bitly.com/v4/shorten';
 
-    const getBitLink = (url) => {
+    const getBitLink = (url: string) => {
         const data = {
             "long_url": url
         }
@@ -21,7 +21,7 @@ const ShortenUrlForm = () => {
         return axios.post(apiEndpoint, data, axiosConfig);
     }
 
-    const checkIsValidUrl= (string)=> {
+    const checkIsValidUrl= (string: string)=> {
         let url;
         
         try {

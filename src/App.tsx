@@ -3,7 +3,7 @@ import logo from './img/tier-logo.svg';
 import './css/App.css';
 import ShortenUrlForm from './components';
 
-const App = () => (
+const App: React.FC = () => (
     <div className="App">
         <img src={logo} className="App-logo" alt="logo" />
         <p>Change mobility for good</p>
